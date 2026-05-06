@@ -1,4 +1,7 @@
 import sys
+import os
+import subprocess
+import platform
 from datetime import date, datetime
 from pathlib import Path
 from PyQt6.QtWidgets import (
@@ -42,6 +45,12 @@ QLabel#section_label {
     text-transform: uppercase;
 }
 
+QLabel#required_star {
+    color: #dd6974;
+    font-size: 13px;
+    background: transparent;
+}
+
 QLineEdit {
     background-color: #22211f;
     border: 1px solid #393836;
@@ -59,6 +68,11 @@ QLineEdit:focus {
 
 QLineEdit:hover {
     border: 1px solid #4a4846;
+}
+
+QLineEdit[invalid="true"] {
+    border: 1px solid #a13544;
+    background-color: #251d1e;
 }
 
 QLineEdit#mono_input {
@@ -133,7 +147,24 @@ QFrame#divider {
     border: none;
     max-height: 1px;
 }
+
+QLabel#error_label {
+    color: #dd6974;
+    font-size: 12px;
+    background: transparent;
+}
 """
+
+
+def open_folder(path: Path):
+    """Open a folder in the system file explorer, cross-platform."""
+    system = platform.system()
+    if system == "Windows":
+        os.startfile(str(path))
+    elif system == "Darwin":
+        subprocess.Popen(["open", str(path)])
+    else:
+        subprocess.Popen(["xdg-open", str(path)])
 
 
 class FolderCreator(QWidget):
@@ -185,7 +216,7 @@ class FolderCreator(QWidget):
         self.date_input.setPlaceholderText("AAAA-MM-JJ")
         self.date_input.setFixedWidth(120)
         self.date_input.textEdited.connect(self._on_date_edited)
-        self.date_input.textChanged.connect(self._update_preview)
+        self.date_input.textChanged.connect(self._update_folder_name)
         self.reset_date_btn = self._reset_button("↺ Aujourd'hui")
         self.reset_date_btn.clicked.connect(self._reset_date)
         self.reset_date_btn.hide()
@@ -198,32 +229,47 @@ class FolderCreator(QWidget):
         self.time_input.setMaxLength(5)
         self.time_input.setFixedWidth(90)
         self.time_input.textEdited.connect(self._on_time_edited)
-        self.time_input.textChanged.connect(self._update_preview)
+        self.time_input.textChanged.connect(self._update_folder_name)
         self.reset_time_btn = self._reset_button("↺ Maintenant")
         self.reset_time_btn.clicked.connect(self._reset_time)
         self.reset_time_btn.hide()
         form.addRow("Heure :", self._inline(self.time_input, self.reset_time_btn, note="modifiable si nécessaire"))
 
-        # RBVQ
+        # RBVQ (required)
         self.card_number_input = QLineEdit()
         self.card_number_input.setPlaceholderText("ex: 1234A")
         self.card_number_input.setMaxLength(6)
         self.card_number_input.textChanged.connect(self._on_rbvq_changed)
-        form.addRow("RBVQ :", self.card_number_input)
+        form.addRow(self._required_label("RBVQ :"), self.card_number_input)
+        self.rbvq_error = self._error_label()
+        form.addRow("", self.rbvq_error)
 
-        # Couleur
+        # Couleur (required)
         self.color_input = QLineEdit()
         self.color_input.setPlaceholderText("ex: Rouge")
-        self.color_input.textChanged.connect(self._update_preview)
-        form.addRow("Couleur :", self.color_input)
+        self.color_input.textChanged.connect(self._update_folder_name)
+        self.color_input.textChanged.connect(lambda t: self._clear_error(self.color_error, self.color_input) if t.strip() else None)
+        form.addRow(self._required_label("Couleur :"), self.color_input)
+        self.color_error = self._error_label()
+        form.addRow("", self.color_error)
 
-        # Email / Téléphone
+        # Email / Téléphone (required)
         self.phone_input = QLineEdit()
         self.phone_input.setPlaceholderText("email ou téléphone")
-        form.addRow("Email / Téléphone :", self.phone_input)
+        self.phone_input.textChanged.connect(lambda t: self._clear_error(self.phone_error, self.phone_input) if t.strip() else None)
+        form.addRow(self._required_label("Email / Téléphone :"), self.phone_input)
+        self.phone_error = self._error_label()
+        form.addRow("", self.phone_error)
 
         outer.addLayout(form)
-        outer.addSpacing(20)
+        outer.addSpacing(6)
+
+        # Required fields legend
+        legend = QLabel("  ✦  Champ obligatoire")
+        legend.setObjectName("subtitle")
+        outer.addWidget(legend)
+
+        outer.addSpacing(16)
         outer.addWidget(self._divider())
         outer.addSpacing(20)
 
@@ -260,16 +306,6 @@ class FolderCreator(QWidget):
         outer.addWidget(self._divider())
         outer.addSpacing(20)
 
-        # Preview label (read-only, no editable field)
-        outer.addWidget(self._section("APERÇU DU NOM"))
-        outer.addSpacing(8)
-        self.preview = QLabel(self._folder_name())
-        self.preview.setObjectName("preview_value")
-        self.preview.setWordWrap(True)
-        self.preview.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        outer.addWidget(self.preview)
-        outer.addSpacing(20)
-
         # Create button
         self.create_btn = QPushButton("Créer le dossier")
         self.create_btn.setObjectName("create_btn")
@@ -278,6 +314,21 @@ class FolderCreator(QWidget):
         outer.addWidget(self.create_btn)
 
     # ── Widget helpers ───────────────────────────────────────────
+
+    def _required_label(self, text: str) -> QWidget:
+        """Form label with a small pink star to indicate a required field."""
+        container = QWidget()
+        container.setStyleSheet("background: transparent;")
+        row = QHBoxLayout(container)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(2)
+        lbl = QLabel(text)
+        star = QLabel("✦")
+        star.setObjectName("required_star")
+        row.addWidget(lbl)
+        row.addWidget(star)
+        row.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        return container
 
     def _section(self, text: str) -> QLabel:
         lbl = QLabel(text)
@@ -297,7 +348,6 @@ class FolderCreator(QWidget):
         return btn
 
     def _inline(self, *widgets, note: str = "") -> QWidget:
-        """Pack widgets (and optional note label) into a horizontal container."""
         container = QWidget()
         container.setStyleSheet("background: transparent;")
         row = QHBoxLayout(container)
@@ -312,20 +362,40 @@ class FolderCreator(QWidget):
         row.addStretch()
         return container
 
+    def _mark_invalid(self, field: QLineEdit, invalid: bool):
+        field.setProperty("invalid", "true" if invalid else "false")
+        field.style().unpolish(field)
+        field.style().polish(field)
+
+    def _error_label(self) -> QLabel:
+        lbl = QLabel("")
+        lbl.setObjectName("error_label")
+        lbl.hide()
+        return lbl
+
+    def _show_error(self, lbl: QLabel, msg: str):
+        lbl.setText(msg)
+        lbl.show()
+
+    def _clear_error(self, lbl: QLabel, field: QLineEdit):
+        lbl.hide()
+        lbl.setText("")
+        self._mark_invalid(field, False)
+
     # ── State helpers ────────────────────────────────────────────
 
     def _datetime_str(self) -> str:
         return datetime.now().strftime("Date : %Y-%m-%d   |   Heure : %H:%M")
 
     def _folder_name(self) -> str:
-        d     = self.date_input.text().strip()      if hasattr(self, "date_input")        else date.today().strftime("%Y-%m-%d")
-        t     = self.time_input.text().strip()      if hasattr(self, "time_input")        else datetime.now().strftime("%H%M")
+        d     = self.date_input.text().strip()        if hasattr(self, "date_input")        else date.today().strftime("%Y-%m-%d")
+        t     = self.time_input.text().strip()        if hasattr(self, "time_input")        else datetime.now().strftime("%H%M")
         rbvq  = self.card_number_input.text().strip() if hasattr(self, "card_number_input") else ""
-        color = self.color_input.text().strip()     if hasattr(self, "color_input")       else ""
+        color = self.color_input.text().strip()       if hasattr(self, "color_input")       else ""
         return f"{d}-{t}-RBVQ{rbvq}-{color}"
 
-    def _update_preview(self):
-        self.preview.setText(self._folder_name())
+    def _update_folder_name(self):
+        pass  # no preview label to update anymore
 
     def _set_edited(self, field: QLineEdit, edited: bool):
         field.setProperty("edited", "true" if edited else "false")
@@ -340,14 +410,12 @@ class FolderCreator(QWidget):
             self.time_input.blockSignals(True)
             self.time_input.setText(datetime.now().strftime("%H%M"))
             self.time_input.blockSignals(False)
-            self._update_preview()
         if not self._date_edited:
             today = date.today().strftime("%Y-%m-%d")
             if self.date_input.text() != today:
                 self.date_input.blockSignals(True)
                 self.date_input.setText(today)
                 self.date_input.blockSignals(False)
-                self._update_preview()
 
     # ── Date / time overrides ────────────────────────────────────
 
@@ -383,7 +451,8 @@ class FolderCreator(QWidget):
             self.card_number_input.setText(upper)
             self.card_number_input.setCursorPosition(cursor)
             self.card_number_input.blockSignals(False)
-        self._update_preview()
+        if text.strip():
+            self._clear_error(self.rbvq_error, self.card_number_input)
 
     # ── Directory picker ─────────────────────────────────────────
 
@@ -405,15 +474,42 @@ class FolderCreator(QWidget):
         d     = self.date_input.text().strip()
         notes = self.notes_input.toPlainText().strip()
 
-        missing = [name for name, val in [
-            ("RBVQ", rbvq), ("Couleur", color), ("Heure", time), ("Date", d)
-        ] if not val]
+        # Validate required fields
+        valid = True
 
-        if missing:
-            QMessageBox.warning(
-                self, "Champs manquants",
-                f"Veuillez remplir : {', '.join(missing)}"
-            )
+        # RBVQ: must be non-empty and at least 2 chars (basic completeness check)
+        if not rbvq:
+            self._mark_invalid(self.card_number_input, True)
+            self._show_error(self.rbvq_error, "Ce champ est obligatoire.")
+            valid = False
+        elif len(rbvq) != 6:
+            self._mark_invalid(self.card_number_input, True)
+            self._show_error(self.rbvq_error, "Doit contenir exactement 6 caractères.")
+            valid = False
+        else:
+            self._clear_error(self.rbvq_error, self.card_number_input)
+
+        if not color:
+            self._mark_invalid(self.color_input, True)
+            self._show_error(self.color_error, "Ce champ est obligatoire.")
+            valid = False
+        else:
+            self._clear_error(self.color_error, self.color_input)
+
+        if not phone:
+            self._mark_invalid(self.phone_input, True)
+            self._show_error(self.phone_error, "Ce champ est obligatoire.")
+            valid = False
+        else:
+            self._clear_error(self.phone_error, self.phone_input)
+
+        # Date and time: just highlight, no inline label (auto-filled fields)
+        self._mark_invalid(self.date_input, not d)
+        self._mark_invalid(self.time_input, not time)
+        if not d or not time:
+            valid = False
+
+        if not valid:
             return
 
         dest = self._output_dir / self._folder_name()
@@ -432,13 +528,10 @@ class FolderCreator(QWidget):
                 "\n".join(lines) + "\n",
                 encoding="utf-8"
             )
-            QMessageBox.information(self, "Succès", f'Dossier créé :\n{dest}')
-            for inp in (self.card_number_input, self.color_input,
-                        self.phone_input):
-                inp.clear()
-            self.notes_input.clear()
-            self._reset_time()
-            self._reset_date()
+
+            open_folder(dest)
+            QApplication.instance().quit()
+
         except PermissionError:
             QMessageBox.critical(
                 self, "Erreur de permission",
