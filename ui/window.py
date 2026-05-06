@@ -19,7 +19,6 @@ from logic.validation import (
     validate_rbvq, validate_required
 )
 
-
 class FolderCreator(QWidget):
     def __init__(self):
         super().__init__()
@@ -35,7 +34,7 @@ class FolderCreator(QWidget):
         self._timer.timeout.connect(self._tick)
         self._timer.start(1000)
 
-    # ── UI construction ──────────────────────────────────────────
+    # UI construction --------------------------------
 
     def _build_ui(self):
         outer = QVBoxLayout(self)
@@ -166,7 +165,7 @@ class FolderCreator(QWidget):
         self.create_btn.clicked.connect(self._create_folder)
         outer.addWidget(self.create_btn)
 
-    # ── Datetime helpers ─────────────────────────────────────────
+    # Datetime helpers ------------------------------------
 
     def _datetime_str(self) -> str:
         return datetime.now().strftime("Date : %Y-%m-%d   |   Heure : %H:%M")
@@ -224,7 +223,7 @@ class FolderCreator(QWidget):
         if text.strip():
             clear_error(self.rbvq_error, self.card_number_input)
 
-    # ── Directory picker ─────────────────────────────────────────
+    # Directory picker -------------------------------------
 
     def _pick_directory(self):
         chosen = QFileDialog.getExistingDirectory(
@@ -234,7 +233,7 @@ class FolderCreator(QWidget):
             self._output_dir = Path(chosen)
             self.dir_display.setText(chosen)
 
-    # ── Create action ────────────────────────────────────────────
+    # Create action --------------------------------------
 
     def _create_folder(self):
         rbvq  = self.card_number_input.text().strip()

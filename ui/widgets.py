@@ -4,12 +4,10 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
-
 def make_section(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setObjectName("section_label")
     return lbl
-
 
 def make_divider() -> QFrame:
     f = QFrame()
@@ -18,19 +16,16 @@ def make_divider() -> QFrame:
     f.setFixedHeight(1)
     return f
 
-
 def make_reset_button(label: str) -> QPushButton:
     btn = QPushButton(label)
     btn.setObjectName("reset_btn")
     return btn
-
 
 def make_error_label() -> QLabel:
     lbl = QLabel("")
     lbl.setObjectName("error_label")
     lbl.hide()
     return lbl
-
 
 def make_required_label(text: str) -> QWidget:
     """Form row label with a red star indicating a required field."""
@@ -47,7 +42,6 @@ def make_required_label(text: str) -> QWidget:
     row.addWidget(star)
     row.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
     return container
-
 
 def make_inline(*widgets: QWidget, note: str = "") -> QWidget:
     """Pack widgets (and an optional note label) into a horizontal row."""
