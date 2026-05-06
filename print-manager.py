@@ -240,7 +240,7 @@ class FolderCreator(QWidget):
         outer.addSpacing(20)
 
         # Section: Destination
-        outer.addWidget(self._section("DOSSIER DE DESTINATION"))
+        outer.addWidget(self._section("DOSSIER DE DESTINATION - modifiable si nécessaire"))
         outer.addSpacing(10)
         dir_row = QHBoxLayout()
         dir_row.setSpacing(8)
