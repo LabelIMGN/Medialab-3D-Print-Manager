@@ -159,7 +159,7 @@ class FolderCreator(QWidget):
         outer.setSpacing(0)
 
         # Header
-        title = QLabel("Créateur de dossier")
+        title = QLabel("Créer un dossier")
         title.setObjectName("title")
         self.subtitle = QLabel(self._datetime_str())
         self.subtitle.setObjectName("subtitle")
@@ -189,7 +189,7 @@ class FolderCreator(QWidget):
         self.reset_date_btn = self._reset_button("↺ Aujourd'hui")
         self.reset_date_btn.clicked.connect(self._reset_date)
         self.reset_date_btn.hide()
-        form.addRow("Date :", self._inline(self.date_input, self.reset_date_btn))
+        form.addRow("Date :", self._inline(self.date_input, self.reset_date_btn, note="modifiable si nécessaire"))
 
         # Time row
         self.time_input = QLineEdit(datetime.now().strftime("%H%M"))
@@ -202,8 +202,7 @@ class FolderCreator(QWidget):
         self.reset_time_btn = self._reset_button("↺ Maintenant")
         self.reset_time_btn.clicked.connect(self._reset_time)
         self.reset_time_btn.hide()
-        form.addRow("Heure :", self._inline(self.time_input, self.reset_time_btn,
-                                            note="modifiable si nécessaire"))
+        form.addRow("Heure :", self._inline(self.time_input, self.reset_time_btn, note="modifiable si nécessaire"))
 
         # RBVQ
         self.card_number_input = QLineEdit()
