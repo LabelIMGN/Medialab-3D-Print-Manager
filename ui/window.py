@@ -118,7 +118,7 @@ class FolderCreator(QWidget):
 
         outer.addLayout(form)
         outer.addSpacing(6)
-        legend = QLabel("  ✦  Champ obligatoire")
+        legend = QLabel("  *  Champ obligatoire")
         legend.setObjectName("subtitle")
         outer.addWidget(legend)
         outer.addSpacing(16)
