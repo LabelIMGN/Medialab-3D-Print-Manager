@@ -16,6 +16,7 @@ from ui.widgets import (
 from logic.folder import build_folder_name, create_folder, open_folder
 from logic.validation import (
     mark_invalid, show_error, clear_error,
+    validate_date, validate_time,
     validate_rbvq, validate_required
 )
 
@@ -71,8 +72,10 @@ class FolderCreator(QWidget):
         self.reset_date_btn = make_reset_button("↺ Aujourd'hui")
         self.reset_date_btn.clicked.connect(self._reset_date)
         self.reset_date_btn.hide()
+        self.date_error = make_error_label()
         form.addRow("Date :", make_inline(self.date_input, self.reset_date_btn,
                                          note="modifiable si nécessaire"))
+        form.addRow("", self.date_error)
 
         # Time
         self.time_input = QLineEdit(datetime.now().strftime("%Hh%M"))
@@ -84,8 +87,11 @@ class FolderCreator(QWidget):
         self.reset_time_btn = make_reset_button("↺ Maintenant")
         self.reset_time_btn.clicked.connect(self._reset_time)
         self.reset_time_btn.hide()
+        self.time_error = make_error_label()
         form.addRow("Heure :", make_inline(self.time_input, self.reset_time_btn,
                                            note="modifiable si nécessaire"))
+        form.addRow("", self.time_error)
+
 
         # RBVQ
         self.card_number_input = QLineEdit()
@@ -193,6 +199,8 @@ class FolderCreator(QWidget):
             self._date_edited = True
             self._set_edited(self.date_input, True)
             self.reset_date_btn.show()
+        if self.date_input.text().strip():
+            clear_error(self.date_error, self.date_input)
 
     def _reset_date(self):
         self._date_edited = False
@@ -205,6 +213,8 @@ class FolderCreator(QWidget):
             self._time_edited = True
             self._set_edited(self.time_input, True)
             self.reset_time_btn.show()
+        if self.time_input.text().strip():
+            clear_error(self.time_error, self.time_input)
 
     def _reset_time(self):
         self._time_edited = False
@@ -269,10 +279,29 @@ class FolderCreator(QWidget):
         else:
             clear_error(self.phone_error, self.phone_input)
 
-        mark_invalid(self.date_input, not d)
-        mark_invalid(self.time_input, not t)
-        if not d or not t:
+        # mark_invalid(self.date_input, not d)
+        # mark_invalid(self.time_input, not t)
+        # if not d or not t:
+        #     valid = False
+        #
+        # if not valid:
+        #     return
+
+        date_err = validate_date(d)
+        if date_err:
+            mark_invalid(self.date_input, True)
+            show_error(self.date_error, date_err)
             valid = False
+        else:
+            clear_error(self.date_error, self.date_input)
+
+        time_err = validate_time(t)
+        if time_err:
+            mark_invalid(self.date_input, True)
+            show_error(self.time_error, time_err)
+            valid = False
+        else:
+            clear_error(self.time_error, self.time_input)
 
         if not valid:
             return
