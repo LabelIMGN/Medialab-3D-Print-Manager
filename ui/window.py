@@ -104,7 +104,7 @@ class FolderCreator(QWidget):
 
         # Couleur
         self.color_input = QLineEdit()
-        self.color_input.setPlaceholderText("ex: Rouge")
+        self.color_input.setPlaceholderText("N'OUBLIEZ PAS DE L'ÉCRIRE SUR LES PLAQUES AUSSI!")
         self.color_error = make_error_label()
         self.color_input.textChanged.connect(
             lambda t: clear_error(self.color_error, self.color_input) if t.strip() else None
