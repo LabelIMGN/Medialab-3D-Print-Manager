@@ -23,7 +23,7 @@ class FolderCreator(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Créateur de dossier")
-        self.setMinimumWidth(480)
+        self.setMinimumWidth(600)
         self.setStyleSheet(STYLE)
         self._output_dir = Path.cwd()
         self._time_edited = False
