@@ -75,9 +75,9 @@ class FolderCreator(QWidget):
                                          note="modifiable si nécessaire"))
 
         # Time
-        self.time_input = QLineEdit(datetime.now().strftime("%H%M"))
+        self.time_input = QLineEdit(datetime.now().strftime("%Hh%M"))
         self.time_input.setObjectName("mono_input")
-        self.time_input.setPlaceholderText("HHMM")
+        self.time_input.setPlaceholderText("HHhMM")
         self.time_input.setMaxLength(5)
         self.time_input.setFixedWidth(90)
         self.time_input.textEdited.connect(self._on_time_edited)
@@ -179,7 +179,7 @@ class FolderCreator(QWidget):
         self.subtitle.setText(self._datetime_str())
         if not self._time_edited:
             self.time_input.blockSignals(True)
-            self.time_input.setText(datetime.now().strftime("%H%M"))
+            self.time_input.setText(datetime.now().strftime("%Hh%M"))
             self.time_input.blockSignals(False)
         if not self._date_edited:
             today = date.today().strftime("%Y-%m-%d")
@@ -208,7 +208,7 @@ class FolderCreator(QWidget):
 
     def _reset_time(self):
         self._time_edited = False
-        self.time_input.setText(datetime.now().strftime("%H%M"))
+        self.time_input.setText(datetime.now().strftime("%Hh%M"))
         self._set_edited(self.time_input, False)
         self.reset_time_btn.hide()
 

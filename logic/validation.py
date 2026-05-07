@@ -24,6 +24,14 @@ def validate_rbvq(value: str) -> str | None:
         return f"Doit contenir exactement {RBVQ_LENGTH} caractères."
     return None
 
+def validate_date(value: str) -> str | None:
+    """Return an error message, or None if valid."""
+    pass
+
+def validate_time(value: str) -> str | None:
+    """Return an error message, or None if valid."""
+    pass
+
 def validate_required(value: str) -> str | None:
     """Return an error message, or None if valid."""
     if not value:
