@@ -92,7 +92,6 @@ class FolderCreator(QWidget):
                                            note="modifiable si nécessaire"))
         form.addRow("", self.time_error)
 
-
         # RBVQ
         self.card_number_input = QLineEdit()
         self.card_number_input.setPlaceholderText("ex: 1234A")
@@ -311,7 +310,9 @@ class FolderCreator(QWidget):
         try:
             create_folder(dest, phone, notes)
             open_folder(dest)
-            QApplication.instance().quit()
+            app = QApplication.instance()
+            assert app is not None
+            app.quit()
         except PermissionError:
             from PyQt6.QtWidgets import QMessageBox
             QMessageBox.critical(
