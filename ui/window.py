@@ -163,11 +163,20 @@ class FolderCreator(QWidget):
         outer.addWidget(make_divider())
         outer.addSpacing(20)
 
+        # So fields don't consume the Enter key, allowing Enter to submit form
+        for field in [
+            self.date_input, self.time_input,
+            self.card_number_input, self.color_input, self.phone_input
+        ]:
+            field.returnPressed.connect(self._create_folder)
+        
         # Create button
         self.create_btn = QPushButton("Créer le dossier")
         self.create_btn.setObjectName("create_btn")
         self.create_btn.setMinimumHeight(42)
         self.create_btn.clicked.connect(self._create_folder)
+        self.create_btn.setDefault(True)
+        self.create_btn.setFocus()
         outer.addWidget(self.create_btn)
 
     # Datetime helpers ------------------------------------
