@@ -1,9 +1,9 @@
-from PyQt6.QtWidgets import QLineEdit, QLabel
+from PyQt6.QtWidgets import QWidget, QLabel
 import re
 
 RBVQ_LENGTH = 6
 
-def mark_invalid(field: QLineEdit, invalid: bool) -> None:
+def mark_invalid(field: QWidget, invalid: bool) -> None:
     field.setProperty("invalid", "true" if invalid else "false")
     field.style().unpolish(field)
     field.style().polish(field)
@@ -12,7 +12,7 @@ def show_error(label: QLabel, msg: str) -> None:
     label.setText(msg)
     label.show()
 
-def clear_error(label: QLabel, field: QLineEdit) -> None:
+def clear_error(label: QLabel, field: QWidget) -> None:
     label.hide()
     label.setText("")
     mark_invalid(field, False)
