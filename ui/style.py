@@ -138,4 +138,23 @@ QLabel#error_label {
     font-size: 12px;
     background: transparent;
 }
+
+QCalendarWidget QToolButton {
+    color: #cdccca;
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+QCalendarWidget QToolButton:hover {
+    background-color: #2d2c2a;
+    color: #f0efed;
+}
+
+QCalendarWidget QToolButton:pressed {
+    background-color: #393836;
+}
 """
