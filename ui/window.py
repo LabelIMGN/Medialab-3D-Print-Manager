@@ -1,12 +1,12 @@
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 
 from PyQt6.QtWidgets import (
     QWidget, QLabel, QLineEdit, QPushButton,
     QVBoxLayout, QHBoxLayout, QFormLayout,
-    QFileDialog, QTextEdit, QApplication
+    QFileDialog, QTextEdit, QApplication, QDateEdit
 )
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, QTimer, QDate
 
 from ui.style import STYLE
 from ui.widgets import (
@@ -65,11 +65,18 @@ class FolderCreator(QWidget):
         form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
 
         # Date
-        self.date_input = QLineEdit(date.today().strftime("%Y-%m-%d"))
+        # self.date_input = QLineEdit(date.today().strftime("%Y-%m-%d"))
+        # self.date_input.setObjectName("mono_input")
+        # self.date_input.setPlaceholderText("AAAA-MM-JJ")
+        # self.date_input.setFixedWidth(120)
+        # self.date_input.textEdited.connect(self._on_date_edited)
+        self.date_input = QDateEdit()
+        self.date_input.setCalendarPopup(True)
+        self.date_input.setDate(QDate.currentDate())
+        self.date_input.setDisplayFormat("yyyy-MM-dd")
         self.date_input.setObjectName("mono_input")
-        self.date_input.setPlaceholderText("AAAA-MM-JJ")
-        self.date_input.setFixedWidth(120)
-        self.date_input.textEdited.connect(self._on_date_edited)
+        self.date_input.setFixedWidth(130)
+        self.date_input.dateChanged.connect(self._on_date_edited)
         self.reset_date_btn = make_reset_button("↺ Aujourd'hui")
         self.reset_date_btn.clicked.connect(self._reset_date)
         self.reset_date_btn.hide()
@@ -166,7 +173,7 @@ class FolderCreator(QWidget):
 
         # So fields don't consume the Enter key, allowing Enter to submit form
         for field in [
-            self.date_input, self.time_input,
+            self.time_input,
             self.card_number_input, self.color_input, self.phone_input
         ]:
             field.returnPressed.connect(self._create_folder)
@@ -204,11 +211,9 @@ class FolderCreator(QWidget):
             self.time_input.setText(datetime.now().strftime("%Hh%M"))
             self.time_input.blockSignals(False)
         if not self._date_edited:
-            today = date.today().strftime("%Y-%m-%d")
-            if self.date_input.text() != today:
-                self.date_input.blockSignals(True)
-                self.date_input.setText(today)
-                self.date_input.blockSignals(False)
+            self.date_input.blockSignals(True)
+            self.date_input.setDate(QDate.currentDate())
+            self.date_input.blockSignals(False)
 
     def _on_date_edited(self):
         if not self._date_edited:
@@ -220,7 +225,7 @@ class FolderCreator(QWidget):
 
     def _reset_date(self):
         self._date_edited = False
-        self.date_input.setText(date.today().strftime("%Y-%m-%d"))
+        self.date_input.blockSignals(True)
         self._set_edited(self.date_input, False)
         self.reset_date_btn.hide()
 
@@ -266,7 +271,7 @@ class FolderCreator(QWidget):
         color = self.color_input.text().strip()
         phone = self.phone_input.text().strip()
         t     = self.time_input.text().strip()
-        d     = self.date_input.text().strip()
+        d = self.date_input.date().toString("yyyy-MM-dd")
         notes = self.notes_input.toPlainText().strip()
 
         valid = True
