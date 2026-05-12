@@ -305,7 +305,7 @@ class FolderCreator(QWidget):
 
         time_err = validate_time(t)
         if time_err:
-            mark_invalid(self.date_input, True)
+            mark_invalid(self.time_input, True)
             show_error(self.time_error, time_err)
             valid = False
         else:
