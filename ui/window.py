@@ -34,6 +34,7 @@ class FolderCreator(QWidget):
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._tick)
         self._timer.start(1000)
+        self._center_window()
 
     # UI construction --------------------------------
 
@@ -178,6 +179,13 @@ class FolderCreator(QWidget):
         self.create_btn.setDefault(True)
         self.create_btn.setFocus()
         outer.addWidget(self.create_btn)
+
+    def _center_window(self):
+        screen = QApplication.primaryScreen().availableGeometry() # None is not checked, ignore it for now
+        self.adjustSize()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2 - 60  # shift 60px above center
+        self.move(x, y)
 
     # Datetime helpers ------------------------------------
 
