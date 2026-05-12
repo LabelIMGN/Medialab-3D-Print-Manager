@@ -4,7 +4,7 @@ from ui.window import FolderCreator
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyle("Fusion")
+    app.setStyle("Windows")
     win = FolderCreator()
     win.show()
     sys.exit(app.exec())
