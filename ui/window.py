@@ -179,7 +179,7 @@ class FolderCreator(QWidget):
         self.create_btn.setMinimumHeight(42)
         self.create_btn.clicked.connect(self._create_folder)
         self.create_btn.setDefault(True)
-        self.create_btn.setFocus()
+        self.card_number_input.setFocus()
         outer.addWidget(self.create_btn)
 
     def _center_window(self):
