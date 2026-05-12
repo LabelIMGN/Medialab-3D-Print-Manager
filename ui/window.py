@@ -65,11 +65,6 @@ class FolderCreator(QWidget):
         form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
 
         # Date
-        # self.date_input = QLineEdit(date.today().strftime("%Y-%m-%d"))
-        # self.date_input.setObjectName("mono_input")
-        # self.date_input.setPlaceholderText("AAAA-MM-JJ")
-        # self.date_input.setFixedWidth(120)
-        # self.date_input.textEdited.connect(self._on_date_edited)
         self.date_input = QDateEdit()
         self.date_input.setCalendarPopup(True)
         self.date_input.setDate(QDate.currentDate())
@@ -299,14 +294,6 @@ class FolderCreator(QWidget):
             valid = False
         else:
             clear_error(self.phone_error, self.phone_input)
-
-        # mark_invalid(self.date_input, not d)
-        # mark_invalid(self.time_input, not t)
-        # if not d or not t:
-        #     valid = False
-        #
-        # if not valid:
-        #     return
 
         date_err = validate_date(d)
         if date_err:
