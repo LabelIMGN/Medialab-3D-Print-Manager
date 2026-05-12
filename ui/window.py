@@ -4,7 +4,8 @@ from pathlib import Path
 from PyQt6.QtWidgets import (
     QWidget, QLabel, QLineEdit, QPushButton,
     QVBoxLayout, QHBoxLayout, QFormLayout,
-    QFileDialog, QTextEdit, QApplication, QDateEdit
+    QFileDialog, QTextEdit, QApplication,
+    QDateEdit, QMessageBox
 )
 from PyQt6.QtCore import Qt, QTimer, QDate
 
@@ -323,12 +324,10 @@ class FolderCreator(QWidget):
             assert app is not None
             app.quit()
         except PermissionError:
-            from PyQt6.QtWidgets import QMessageBox
             QMessageBox.critical(
                 self, "Erreur de permission",
                 f"Impossible de créer le dossier ici :\n{dest}\n\n"
                 "Choisissez un autre emplacement."
             )
         except Exception as e:
-            from PyQt6.QtWidgets import QMessageBox
             QMessageBox.critical(self, "Erreur", str(e))
