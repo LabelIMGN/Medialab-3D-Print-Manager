@@ -97,7 +97,7 @@ class FolderCreator(QWidget):
 
         # RBVQ
         self.card_number_input = QLineEdit()
-        self.card_number_input.setPlaceholderText("ex: 1234A")
+        self.card_number_input.setPlaceholderText("ex: 12345A")
         self.card_number_input.setMaxLength(6)
         self.card_number_input.textChanged.connect(self._on_rbvq_changed)
         self.rbvq_error = make_error_label()
