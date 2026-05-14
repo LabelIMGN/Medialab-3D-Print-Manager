@@ -14,7 +14,7 @@ def create_folder(dest: Path, phone: str, notes: str) -> None:
 
     contact = format_phone(phone) if '@' not in phone else phone
 
-    lines = [f"Email ou Telephone: {contact}"]
+    lines = [f"Email ou Téléphone : {contact}"]
     if notes:
         lines += [
             " ",
