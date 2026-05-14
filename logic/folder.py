@@ -3,6 +3,7 @@ import subprocess
 import platform
 from datetime import date, datetime
 from pathlib import Path
+from logic.validation import format_phone
 
 def build_folder_name(d: str, t: str, rbvq: str, color: str) -> str:
     return f"{d}-{t}-RBVQ{rbvq}-{color}"
@@ -11,7 +12,9 @@ def create_folder(dest: Path, phone: str, notes: str) -> None:
     """Create the project folder and write Notes.txt. Raises on failure."""
     dest.mkdir(parents=True, exist_ok=True)
 
-    lines = [f"Email ou Telephone: {phone}"]
+    contact = format_phone(phone) if '@' not in phone else phone
+
+    lines = [f"Email ou Telephone: {contact}"]
     if notes:
         lines += [
             " ",

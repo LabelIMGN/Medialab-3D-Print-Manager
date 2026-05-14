@@ -18,7 +18,8 @@ from logic.folder import build_folder_name, create_folder, open_folder
 from logic.validation import (
     mark_invalid, show_error, clear_error,
     validate_date, validate_time,
-    validate_rbvq, validate_required
+    validate_rbvq, validate_required,
+    validate_contact, format_phone
 )
 
 class FolderCreator(QWidget):
@@ -36,6 +37,15 @@ class FolderCreator(QWidget):
         self._timer.timeout.connect(self._tick)
         self._timer.start(1000)
         self._center_window()
+
+    def _format_phone_input(self):
+        value = self.phone_input.text().strip()
+        if value and '@' not in value:
+            formatted = format_phone(value)
+            if formatted:
+                self.phone_input.blockSignals(True)
+                self.phone_input.setText(formatted)
+                self.phone_input.blockSignals(False)
 
     # UI construction --------------------------------
 
@@ -122,6 +132,7 @@ class FolderCreator(QWidget):
         self.phone_input.textChanged.connect(
             lambda t: clear_error(self.phone_error, self.phone_input) if t.strip() else None
         )
+        self.phone_input.editingFinished.connect(self._format_phone_input)
         form.addRow(make_required_label("Email / Téléphone :"), self.phone_input)
         form.addRow("", self.phone_error)
 
@@ -288,7 +299,7 @@ class FolderCreator(QWidget):
         else:
             clear_error(self.color_error, self.color_input)
 
-        phone_err = validate_required(phone)
+        phone_err = validate_contact(phone)
         if phone_err:
             mark_invalid(self.phone_input, True)
             show_error(self.phone_error, phone_err)

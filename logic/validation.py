@@ -54,3 +54,25 @@ def validate_required(value: str) -> str | None:
     if not value:
         return "Ce champ est obligatoire."
     return None
+
+def format_phone(raw: str) -> str | None:
+    """Strip non-digits and reformat to ###-###-####. Returns None if not 10 digits."""
+    digits = re.sub(r'\D', '', raw)
+    if len(digits) == 11 and digits[0] == '1':
+        digits = digits[1:]  # strip leading country code
+    if len(digits) == 10:
+        return f"{digits[:3]}-{digits[3:6]}-{digits[6:]}"
+    return None
+
+def validate_contact(value: str) -> str | None:
+    """Return an error message, or None if valid (email or ###-###-#### phone)."""
+    if not value:
+        return "Ce champ est obligatoire."
+    if '@' in value:
+        if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", value):
+            return "Adresse courriel invalide."
+        return None
+    formatted = format_phone(value)
+    if formatted is None:
+        return "Format invalide. Entrez un courriel ou un numéro à 10 chiffres."
+    return None
